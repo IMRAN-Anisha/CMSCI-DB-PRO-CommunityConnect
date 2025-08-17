@@ -1,0 +1,159 @@
+/* ===============================
+   Global Styles
+=============================== */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fef9f4; /* soft warm background */
+    color: #333;
+}
+
+/* ===============================
+   Header
+=============================== */
+header {
+    background-color: #2079ff; /* fresh community green */
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+header .logo {
+    font-size: 1.8em;
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+}
+
+header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+header nav ul li a {
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+header nav ul li a:hover {
+    color: #ffeb3b; /* sunny yellow hover */
+}
+
+/* ===============================
+   Hero Section
+=============================== */
+.hero {
+    text-align: center;
+    padding: 100px 20px;
+    background: linear-gradient(to right, #377dff, #1693db); /* green gradient */
+    color: #fff;
+}
+
+.hero h1 {
+    font-size: 3em;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+
+.hero p {
+    font-size: 1.3em;
+    margin-bottom: 30px;
+}
+
+/* ===============================
+   Buttons
+=============================== */
+.btn-primary {
+    display: inline-block;
+    background-color: #ff9800; /* warm orange */
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-primary:hover {
+    background-color: #fb8c00;
+    box-shadow: 0 0 15px #ffcc80; /* glowing effect */
+    transform: translateY(-2px);
+}
+
+/* ===============================
+   Features Section
+=============================== */
+.features {
+    display: flex;
+    justify-content: space-around;
+    padding: 50px 20px;
+    flex-wrap: wrap;
+    gap: 20px;
+    background-color: #ffffff;
+}
+
+.feature {
+    width: 300px;
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    background-color: #e8f5e9;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.feature:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* ===============================
+   Tables
+=============================== */
+table {
+    width: 90%;
+    margin: 30px auto;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+table th, table td {
+    padding: 12px 15px;
+    text-align: center;
+}
+
+table th {
+    background-color: #2aaae6;
+    color: white;
+}
+
+table tr:nth-child(even) {
+    background-color: #f1f8e9;
+}
+
+/* ===============================
+   Footer
+=============================== */
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #2079ff;
+    color: white;
+}
+
+/* ===============================
+   Smooth hover effect for links
+=============================== */
+a {
+    transition: all 0.3s ease;
+}
