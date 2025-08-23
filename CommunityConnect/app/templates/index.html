@@ -1,51 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Community Connect - Home</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-    <script src="script.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Connect</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-
-<header>
+  <!-- Navigation -->
+  <header>
+    <div class="logo">Community Connect</div>
     <nav>
-        <a href="index.html" class="logo">Community Connect</a>
-        <ul>
-            <li><a href="volunteers.html">Volunteers</a></li>
-            <li><a href="companies.html">Companies</a></li>
-            <li><a href="events.html">Events</a></li>
-        </ul>
+      <ul>
+        <li><a href="{{ url_for('index') }}" class="active">Home</a></li>
+        <li><a href="{{ url_for('event_search') }}">Find Events</a></li>
+        <li><a href="{{ url_for('registration') }}">Register</a></li>
+        <li><a href="{{ url_for('login') }}">Login</a></li>
+      </ul>
     </nav>
-</header>
+  </header>
 
-<main>
-    <section class="hero">
-        <h1>Connect with Local Volunteers</h1>
-        <p>Discover opportunities, share your skills, and make a difference in your community.</p>
-        <a href="volunteers.html" class="btn-primary">Get Started</a>
-    </section>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>Welcome to Community Connect</h1>
+      <p><strong>Connecting local volunteers with community organisations that need a helping hand.</strong></p>
+      <div class="hero-buttons">
+        <a href="{{ url_for('registration') }}" class="btn primary">Join as Volunteer</a>
+        <a href="{{ url_for('organisation_dashboard') }}" class="btn secondary">For Organisations</a>
+      </div>
+    </div>
+  </section>
 
-    <section class="features">
-        <div class="feature">
-            <h3>Find Events</h3>
-            <p>Search local volunteering events that match your skills and availability.</p>
-        </div>
-        <div class="feature">
-            <h3>Manage Volunteers</h3>
-            <p>Organisations can post events and track signups easily.</p>
-        </div>
-        <div class="feature">
-            <h3>Build Skills</h3>
-            <p>Volunteers can showcase their skills and gain experience.</p>
-        </div>
-    </section>
-</main>
+  <!-- About Section -->
+  <section class="about">
+    <h2>What We Do</h2>
+    <p>Community Connect makes it easier for volunteers to find meaningful opportunities and for organisations to manage their events and teams. Together, we create stronger communities.</p>
+    <div class="cards">
+      <div class="card">
+        <h3>For Volunteers</h3>
+        <p>Find events that match your skills, schedule, and passion. Track your contributions and make a difference locally.</p>
+      </div>
+      <div class="card">
+        <h3>For Organisations</h3>
+        <p>Post opportunities, manage volunteers, and grow your impact with ease using our intuitive dashboard.</p>
+      </div>
+      <div class="card">
+        <h3>For the Community</h3>
+        <p>We bridge the gap between those who want to help and those who need it most, building stronger, more connected communities.</p>
+      </div>
+    </div>
+  </section>
 
-<footer>
-    <p>&copy; 2025 Community Connect. All rights reserved.</p>
-</footer>
-
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Community Connect | <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a></p>
+  </footer>
 </body>
 </html>

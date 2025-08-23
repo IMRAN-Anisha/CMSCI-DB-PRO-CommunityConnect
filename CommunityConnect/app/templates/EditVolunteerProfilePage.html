@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volunteer Dashboard - Community Connect</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+  <!-- Header / Navbar -->
+  <header>
+    <div class="logo">Community Connect</div>
+    <nav>
+      <ul>
+        <li><a href="VolunteerDashboard.html" class="active">Profile</a></li>
+        <li><a href="EventSearch.html">Events</a></li>
+        <li><a href="Notifications.html">Notifications</a></li>
+        <li><a href="Accountsettings.html">Account Settings</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Main Profile Section -->
+  <main class="profile-container">
+    
+    <!-- Sidebar -->
+    <aside class="profile-sidebar">
+      <img src="images/defaultProfileImage.png" alt="Profile Picture" class="profile-picture">
+      <h2 id="volunteer-name">Your Name</h2>
+      <p class="volunteer-title">Community Volunteer</p>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="#bio">Bio</a></li>
+          <li><a href="#skills">Skills</a></li>
+          <li><a href="#edit-profile">Edit Profile</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Profile Content -->
+    <section class="profile-content">
+      
+      <!-- About Me -->
+      <div id="bio" class="profile-section">
+        <h3>About Me</h3>
+        <p>Add an About Me!</p>
+      </div>
+
+      <!-- Skills -->
+      <div id="skills" class="profile-section">
+        <h3>Skills</h3>
+        <ul>
+          <li>First Aid</li>
+          <li>Event Planning</li>
+          <li>Community Outreach</li>
+        </ul>
+      </div>
+
+      <!-- Edit Profile -->
+      <div id="edit-profile" class="profile-section">
+        <h3>Edit Profile</h3>
+        <form class="edit-profile-form">
+          <label for="name">Full Name:</label>
+          <input type="text" id="name" name="name" value="Your Name" required>
+
+          <label for="title">Title / Position:</label>
+          <input type="text" id="title" name="title" value="Position Title">
+
+          <label for="bio-text">Bio:</label>
+          <textarea id="bio-text" name="bio-text" rows="5">Add Your Bio Here!</textarea>
+
+          <label for="profile-pic">Profile Picture:</label>
+          <input type="file" id="profile-pic" name="profile-pic" accept="image/*">
+
+          <button type="submit" class="btn primary">Save Changes</button>
+        </form>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 Community Connect. All rights reserved.
+  </footer>
+
+</body>
+</html>

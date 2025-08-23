@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organisation Dashboard - Community Connect</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo">Community Connect</div>
+    <nav>
+      <ul>
+        <li><a href="{{ url_for('index') }}">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Tiles Section -->
+  <section class="dashboard-tiles">
+    <h1>Welcome, [Organisation Name]</h1>
+    <p><strong>Access all your event management tools below.</strong></p>
+
+    <div class="tiles-container">
+      <a href="{{ url_for('notifications') }}" class="tile">
+        <span class="tile-icon">🔔</span>
+        <h3>Notifications</h3>
+        <p>See updates and volunteer responses</p>
+      </a>
+
+      <a href="{{ url_for('edit_post_events') }}" class="tile">
+        <span class="tile-icon">🆕</span>
+        <h3>New Event</h3>
+        <p>Create a new volunteer event</p>
+      </a>
+
+      <a href="{{ url_for('edit_post_events') }}#manage-events" class="tile">
+        <span class="tile-icon">📂</span>
+        <h3>Manage Events</h3>
+        <p>Edit or delete existing events</p>
+      </a>
+
+      <a href="{{ url_for('account_settings') }}" class="tile">
+        <span class="tile-icon">⚙️</span>
+        <h3>Account Settings</h3>
+        <p>Manage organisation account</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 Community Connect. All rights reserved.
+  </footer>
+</body>
+</html>

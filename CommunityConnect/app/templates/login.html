@@ -1,1 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Community Connect</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
 
+  <!-- Header -->
+  <header>
+    <div class="logo">Community Connect</div>
+    <nav>
+      <ul>
+        <li><a href="{{ url_for('index') }}">Home</a></li>
+        <li><a href="{{ url_for('event_search') }}">Events</a></li>
+        <li><a href="{{ url_for('volunteer_dashboard') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('privacy_policy') }}">Privacy Policy</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Welcome Back</h1>
+      <p>Login to your account to manage events, view opportunities, and connect with your community.</p>
+    </div>
+  </section>
+
+  <!-- Login Form -->
+  <section class="about">
+    <div class="content">
+      <h2>Login</h2>
+
+      <form action="{{ url_for('login') }}" method="post" class="login-form">
+        <!-- Email -->
+        <label for="email">Email Address:</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+        <!-- Password -->
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn primary">Login</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 Community Connect. All rights reserved.
+  </footer>
+
+</body>
+</html>

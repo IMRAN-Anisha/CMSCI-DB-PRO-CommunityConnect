@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications - Community Connect</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo">Community Connect</div>
+    <nav>
+      <ul>
+        <li><a href="{{ url_for('volunteer_dashboard') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('event_search') }}">Events</a></li>
+        <li><a href="{{ url_for('notifications') }}" class="active">Notifications</a></li>
+        <li><a href="{{ url_for('account_settings') }}">Account Settings</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Notifications Section -->
+  <section class="notifications-section">
+    <h1>Your Notifications</h1>
+    <p>Here are the latest updates related to your volunteer activities.</p>
+
+    <ul class="notifications-list">
+      <li class="notification-item">
+        <span class="notification-icon">🔔</span>
+        <div class="notification-content">
+          <h3>New Event Available</h3>
+          <p>Community Clean-Up on 25th August. Sign up now!</p>
+          <small>2 hours ago</small>
+        </div>
+      </li>
+
+      <li class="notification-item">
+        <span class="notification-icon">✅</span>
+        <div class="notification-content">
+          <h3>Registration Confirmed</h3>
+          <p>You are successfully registered for the Food Drive event.</p>
+          <small>1 day ago</small>
+        </div>
+      </li>
+
+      <li class="notification-item">
+        <span class="notification-icon">⚠️</span>
+        <div class="notification-content">
+          <h3>Event Update</h3>
+          <p>The Community Garden event timing has changed to 10 AM.</p>
+          <small>3 days ago</small>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 Community Connect. All rights reserved.
+  </footer>
+
+</body>
+</html>

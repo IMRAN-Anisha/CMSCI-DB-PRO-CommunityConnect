@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - Community Connect</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo">Community Connect</div>
+    <nav>
+      <ul>
+        <li><a href="{{ url_for('index') }}">Home</a></li>
+        <li><a href="{{ url_for('event_search') }}">Events</a></li>
+        <li><a href="{{ url_for('volunteer_dashboard') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('privacy_policy') }}" class="active">Privacy Policy</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Privacy Policy</h1>
+      <p><strong>Community Connect is committed to protecting your privacy and complying with the Australian Privacy Principles (APPs).</strong></p>
+    </div>
+  </section>
+
+  <!-- Privacy Content -->
+  <section class="about">
+    <div class="content">
+      
+      <h2>Collection of Personal Information (APP 1, 5)</h2>
+      <p>We collect volunteer and organisation information to connect volunteers with suitable events. The information collected includes:</p>
+      <ul>
+        <li>Volunteer names and contact details</li>
+        <li>Volunteer skills and availability</li>
+        <li>Organisation contact details and event information</li>
+      </ul>
+      <p>When volunteers sign up, they are informed of the purpose of collecting their personal information and who will access it (APP 5).</p>
+
+      <h2>Purpose and Use of Information (APP 6)</h2>
+      <p>Collected information is only used for:</p>
+      <ul>
+        <li>Matching volunteers with events based on their skills and preferences</li>
+        <li>Managing event registrations and sending relevant notifications</li>
+      </ul>
+      <p>We do not share personal information with third parties for marketing purposes (APP 6).</p>
+
+      <h2>Accuracy and Updating Information (APP 10)</h2>
+      <p>Volunteers can update their personal details in their profiles to ensure information is accurate and complete. Organisations are verified when creating accounts to maintain accuracy.</p>
+
+      <h2>Security of Information (APP 11)</h2>
+      <p>We implement strong security measures, including secure password storage and restricted access, to protect personal information from misuse, loss, or unauthorised access.</p>
+
+      <h2>Access and Correction (APP 12)</h2>
+      <p>Volunteers can view, update, or delete their personal information at any time via their profile. Organisations can also update their account details. Requests for access or correction are honoured promptly.</p>
+
+      <h2>Consent</h2>
+      <p>By signing up as a volunteer or organisation, you consent to the collection and use of your personal information for the purposes described above, in line with the relevant APPs.</p>
+
+      <h2>Contact Us</h2>
+      <p>If you have questions or wish to access, correct, or delete your information, please contact us via your dashboard or email <a href="mailto:support@communityconnect.com">support@communityconnect.com</a>.</p>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 Community Connect. All rights reserved.
+  </footer>
+
+</body>
+</html>

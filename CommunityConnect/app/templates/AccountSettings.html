@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Settings - Community Connect</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo">Community Connect</div>
+    <nav>
+      <ul>
+        <li><a href="{{ url_for('volunteer_dashboard') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('event_search') }}">Events</a></li>
+        <li><a href="{{ url_for('notifications') }}">Notifications</a></li>
+        <li><a href="{{ url_for('account_settings') }}" class="active">Account Settings</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Account Settings Form -->
+  <section class="account-settings">
+    <h1>Account Settings</h1>
+    <p>Manage your account details securely.</p>
+
+    <div class="settings-container">
+
+      <!-- Email Section -->
+      <div class="settings-card">
+        <h3>Email Address</h3>
+        <form method="POST" action="{{ url_for('update_email') }}">
+          <label for="email">Current Email:</label>
+          <input type="email" id="email" name="current_email" value="volunteer@example.com">
+
+          <label for="new-email">New Email:</label>
+          <input type="email" id="new-email" name="new_email" placeholder="Enter new email">
+
+          <button type="submit" class="btn primary">Update Email</button>
+        </form>
+      </div>
+
+      <!-- Password Section -->
+      <div class="settings-card">
+        <h3>Password</h3>
+        <form method="POST" action="{{ url_for('update_password') }}">
+          <label for="current-password">Current Password:</label>
+          <input type="password" id="current-password" name="current_password" placeholder="Enter current password">
+
+          <label for="new-password">New Password:</label>
+          <input type="password" id="new-password" name="new_password" placeholder="Enter new password">
+
+          <label for="confirm-password">Confirm Password:</label>
+          <input type="password" id="confirm-password" name="confirm_password" placeholder="Confirm new password">
+
+          <button type="submit" class="btn primary">Update Password</button>
+        </form>
+      </div>
+
+      <!-- Account Deletion Section -->
+      <div class="settings-card">
+        <h3>Delete Account</h3>
+        <p class="warning-text">Warning: This action cannot be undone.</p>
+        <form method="POST" action="{{ url_for('delete_account') }}">
+          <button type="submit" class="btn secondary">Delete Account</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 Community Connect. All rights reserved.
+  </footer>
+
+</body>
+</html>

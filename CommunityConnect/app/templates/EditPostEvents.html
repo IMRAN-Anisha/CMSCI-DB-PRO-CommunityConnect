@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit / Post Event - Community Connect</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo">Community Connect</div>
+    <nav>
+      <ul>
+        <li><a href="{{ url_for('organisation_dashboard') }}" class="active">Dashboard</a></li>
+        <li><a href="{{ url_for('notifications') }}">Notifications</a></li>
+        <li><a href="{{ url_for('account_settings') }}">Account Settings</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="event-edit-container">
+    <h1>Create or Edit Event</h1>
+    <p>Fill in the details below to add a new event or edit an existing one.</p>
+
+    <!-- Event Form -->
+    <form class="event-form" method="POST" action="{{ url_for('edit_event') }}">
+      
+      <label for="event-name">Event Name:</label>
+      <input type="text" id="event-name" name="event_name" placeholder="Enter event title" required>
+
+      <label for="event-desc">Description:</label>
+      <textarea id="event-desc" name="event_desc" rows="5" placeholder="Describe the event..." required></textarea>
+
+      <label for="event-date">Date:</label>
+      <input type="date" id="event-date" name="event_date" required>
+
+      <label for="event-time">Time:</label>
+      <input type="time" id="event-time" name="event_time" required>
+
+      <label for="event-location">Location:</label>
+      <input type="text" id="event-location" name="event_location" placeholder="Enter event location" required>
+
+      <label for="volunteers-needed">Volunteers Needed:</label>
+      <input type="number" id="volunteers-needed" name="volunteers_needed" min="1" placeholder="Number of volunteers" required>
+
+      <div class="form-buttons">
+        <button type="submit" class="btn primary">Save Event</button>
+        <button type="button" class="btn secondary delete-btn">Delete Event</button>
+      </div>
+    </form>
+
+    <!-- Existing Events List -->
+    <section class="existing-events" id="manage-events">
+      <h2>Existing Events</h2>
+      <ul>
+        <li>
+            <strong>Community Clean-Up</strong>
+            <span class="event-date">25th August 2025</span>
+            <button class="btn secondary edit-btn">Edit</button>
+        </li>
+        <li>
+            <strong>Food Drive</strong>
+            <span class="event-date">28th August 2025</span>
+            <button class="btn secondary edit-btn">Edit</button>
+        </li>
+        <li>
+            <strong>Community Garden</strong>
+            <span class="event-date">30th August 2025</span>
+            <button class="btn secondary edit-btn">Edit</button>
+        </li>
+        </ul>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 Community Connect. All rights reserved.
+  </footer>
+
+</body>
+</html>
