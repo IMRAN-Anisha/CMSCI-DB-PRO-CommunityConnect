@@ -1,9 +1,19 @@
 from flask import Flask, render_template, request, redirect, url_for
+import sqlite3
+import os
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # Needed for flash messages
+DATABASE = os.path.join(os.path.dirname(__file__), '..', 'database', 'CommunityConnect.db')
+print(DATABASE)
+
+# ---------------- SQLite Database Connection ---------------- #
+def get_db_connection():
+    conn = sqlite3.connect(DATABASE, timeout=10)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 # ---------------- GET Routes ---------------- #
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -17,19 +27,53 @@ def login():
 
 @app.route('/registration', methods=['GET', 'POST'])
 def registration():
-    selected_account_type = None
-
     if request.method == 'POST':
-        # Get the selected account type from the form
-        selected_account_type = request.form.get('account-type')
+        account_type = request.form.get('account-type')
+        full_name = request.form.get('full-name')
+        email = request.form.get('email')
+        password = request.form.get('password')  # ideally hash this
 
-        # You can add logic here to handle volunteer vs organisation
-        # For now, just stay on the registration page and maybe show a message
-        # Example: pass it to the template
-        # flash(f"You selected {selected_account_type}") # optional message
+        # Split full name for volunteer first and last names
+        first_name = full_name.split()[0]
+        last_name = full_name.split()[-1] if len(full_name.split()) > 1 else ""
 
-    # Render the registration page, passing the selected option if any
-    return render_template('registration.html', selected_account_type=selected_account_type)
+        # Use a context manager to safely open and close the database connection
+        try:
+            with get_db_connection() as conn:
+                cursor = conn.cursor()
+
+                # Insert into Users
+                cursor.execute(
+                    "INSERT INTO Users (Email, Username, Password, Role) VALUES (?, ?, ?, ?)",
+                    (email, full_name, password, account_type)
+                )
+                user_id = cursor.lastrowid
+
+                # Insert into Volunteers or Companies
+                if account_type == 'volunteer':
+                    cursor.execute(
+                        "INSERT INTO Volunteers (FirstName, LastName, DOB, PhoneNumber, Address, UserID) VALUES (?, ?, ?, ?, ?, ?)",
+                        (first_name, last_name, "2000-01-01", "0000000000", "Address", user_id)
+                    )
+                else:  # organisation
+                    cursor.execute(
+                        "INSERT INTO Companies (CompanyName, CompanyEmail, CompanyPhone, CompanyLocation, CompanyWebsite, CompanyCEO, UserID) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        (full_name, email, "0000000000", "Location", "Website", "CEO Name", user_id)
+                    )
+
+                # Commit is automatic with context manager, but can be explicit
+                conn.commit()
+
+        except sqlite3.Error as e:
+            # Optional: flash an error or print it for debugging
+            print(f"Database error: {e}")
+            return render_template('registration.html', error="Something went wrong. Try again.")
+
+        # Show a registration success page
+        return render_template('RegistrationSuccessful.html', name=first_name)
+
+    # GET request: show registration form
+    return render_template('registration.html')
 
 @app.route('/privacy')
 def privacy_policy():
@@ -64,7 +108,6 @@ def edit_post_events():
     return render_template('EditPostEvents.html')
 
 # ---------------- POST Routes ---------------- #
-
 @app.route('/update_email', methods=['POST'])
 def update_email():
     current_email = request.form.get('current_email')
