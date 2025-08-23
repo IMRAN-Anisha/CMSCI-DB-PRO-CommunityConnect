@@ -1,0 +1,50 @@
+Future Features & Enhancements:
+
+    1. Video Demo:
+        A short walkthrough showing the platform in action, highlighting registration, 
+        event participation, and dashboard features.
+
+    2. Complete Documentation:
+        Full design documentation including ER diagrams, milestones, data dictionary,
+        and explanations of design decisions.
+
+    3. Social Worker & Professional Integration:
+        Extend the platform beyond volunteers to allow private social workers, 
+        coordinators, and administrators to manage community support services.
+
+    4. Skill Matching & Recommendations:
+        Automated matching between volunteer skills and event requirements,
+        with suggestions for ideal event participation.
+
+    5. Notifications & Messaging:
+        Real-time notifications, reminders, and secure messaging between 
+        volunteers, organisations, and social workers.
+
+    6. Analytics Dashboard: 
+        Insights into volunteer engagement, event participation, and impact
+        metrics to support reporting and strategic planning.
+
+    7. User Profiles & Portfolios: 
+        Enhanced profiles including achievements, endorsements, certifications,
+        and experience.
+
+    8. Mobile-friendly Interface & App Integration:
+        Optimisation for mobile devices and potential 
+        future mobile app for easier accessibility.
+
+    9. Privacy & Security Improvements:
+        Advanced authentication, role-based access control,
+        and GDPR-compliant data handling.
+
+    10. Community Expansion:
+        Support for additional user types, such as educators,
+        NGOs, or local authorities, to foster a wider community network.
+
+Long-term Vision:
+Community Connect aims to become a hub for connecting skilled volunteers, social workers,
+and organisations, facilitating community engagement, professional development, and social impact.
+
+Important Note:
+This platform acts purely as a connector for volunteers and support workers. 
+All users are responsible for verifying credentials and conducting their own checks.
+The platform is non-profit and does not supervise or employ any users.
