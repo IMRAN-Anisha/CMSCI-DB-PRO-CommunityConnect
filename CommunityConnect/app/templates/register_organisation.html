@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register - Community Connect</title>
+  <title>Register as Organisation - Community Connect</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
@@ -24,32 +24,33 @@
   <!-- Hero Section -->
   <section class="hero">
     <div class="hero-content">
-      <h1>Create an Account</h1>
-      <p><strong>Sign up as a volunteer or organisation to start connecting with local community events.</strong></p>
+      <h1>Organisation Registration</h1>
+      <p><strong>Sign up your organisation to post events and connect with volunteers.</strong></p>
     </div>
   </section>
 
   <!-- Registration Form -->
   <section class="about">
     <div class="content">
-      <h2>Register</h2>
+      <h2>Register as an Organisation</h2>
 
-      <form action="{{ url_for('registration') }}" method="post" class="registration-form">
-        <!-- Account Type -->
-        <label for="account-type">I am registering as:</label>
-        <select id="account-type" name="account-type" required>
-          <option value="">Select account type</option>
-          <option value="volunteer" {% if selected_account_type == 'volunteer' %}selected{% endif %}>Volunteer</option>
-          <option value="organisation" {% if selected_account_type == 'organisation' %}selected{% endif %}>Organisation</option>
-        </select>
+      <form action="{{ url_for('register_organisation') }}" method="post" class="registration-form">
+        
+        <!-- Company Name -->
+        <label for="company-name">Company Name:</label>
+        <input type="text" id="company-name" name="company-name" placeholder="Enter your company name" required>
 
-        <!-- Name -->
-        <label for="full-name">Full Name / Organisation Name:</label>
-        <input type="text" id="full-name" name="full-name" placeholder="Enter your name" required>
+        <!-- Company Email -->
+        <label for="company-email">Company Email:</label>
+        <input type="email" id="company-email" name="company-email" placeholder="Enter your company email" required>
 
-        <!-- Email -->
-        <label for="email">Email Address:</label>
-        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+        <!-- Company Phone -->
+        <label for="company-phone">Company Phone:</label>
+        <input type="tel" id="company-phone" name="company-phone" placeholder="Enter your company phone number" required>
+
+        <!-- Location -->
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location" placeholder="Enter your organisation's location" required>
 
         <!-- Password -->
         <label for="password">Password:</label>

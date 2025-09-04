@@ -14,7 +14,7 @@
       <ul>
         <li><a href="{{ url_for('index') }}" class="active">Home</a></li>
         <li><a href="{{ url_for('event_search') }}">Find Events</a></li>
-        <li><a href="{{ url_for('registration') }}">Register</a></li>
+        <li><a href="{{ url_for('register_volunteer') }}">Register</a></li>
         <li><a href="{{ url_for('login') }}">Login</a></li>
       </ul>
     </nav>
@@ -27,8 +27,8 @@
       <h1>Welcome to Community Connect</h1>
       <p><strong>Connecting local volunteers with community organisations that need a helping hand.</strong></p>
       <div class="hero-buttons">
-        <a href="{{ url_for('registration') }}" class="btn primary">Join as Volunteer</a>
-        <a href="{{ url_for('organisation_dashboard') }}" class="btn secondary">For Organisations</a>
+        <a href="{{ url_for('register_volunteer') }}" class="btn primary">Join as Volunteer</a>
+        <a href="{{ url_for('register_organisation') }}" class="btn secondary">For Organisations</a>
       </div>
     </div>
   </section>

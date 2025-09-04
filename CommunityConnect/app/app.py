@@ -3,7 +3,7 @@ import sqlite3
 import os
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Needed for flash messages
+app.secret_key = 'your_secret_key'
 DATABASE = os.path.join(os.path.dirname(__file__), '..', 'database', 'CommunityConnect.db')
 print(DATABASE)
 
@@ -21,59 +21,80 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        # Placeholder: handle login logic here
         return redirect(url_for('volunteer_dashboard'))
     return render_template('login.html')
 
-@app.route('/registration', methods=['GET', 'POST'])
-def registration():
+# ---------------- Volunteer Registration ---------------- #
+@app.route('/register_volunteer', methods=['GET', 'POST'])
+def register_volunteer():
     if request.method == 'POST':
-        account_type = request.form.get('account-type')
-        full_name = request.form.get('full-name')
+        first_name = request.form.get('first-name')
+        last_name = request.form.get('last-name')
+        dob = request.form.get('dob')
+        address = request.form.get('address')
+        phone = request.form.get('phone')
         email = request.form.get('email')
-        password = request.form.get('password')  # ideally hash this
+        password = request.form.get('password')
 
-        # Split full name for volunteer first and last names
-        first_name = full_name.split()[0]
-        last_name = full_name.split()[-1] if len(full_name.split()) > 1 else ""
-
-        # Use a context manager to safely open and close the database connection
         try:
             with get_db_connection() as conn:
                 cursor = conn.cursor()
-
                 # Insert into Users
                 cursor.execute(
                     "INSERT INTO Users (Email, Username, Password, Role) VALUES (?, ?, ?, ?)",
-                    (email, full_name, password, account_type)
+                    (email, f"{first_name} {last_name}", password, "volunteer")
                 )
                 user_id = cursor.lastrowid
 
-                # Insert into Volunteers or Companies
-                if account_type == 'volunteer':
-                    cursor.execute(
-                        "INSERT INTO Volunteers (FirstName, LastName, DOB, PhoneNumber, Address, UserID) VALUES (?, ?, ?, ?, ?, ?)",
-                        (first_name, last_name, "2000-01-01", "0000000000", "Address", user_id)
-                    )
-                else:  # organisation
-                    cursor.execute(
-                        "INSERT INTO Companies (CompanyName, CompanyEmail, CompanyPhone, CompanyLocation, CompanyWebsite, CompanyCEO, UserID) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                        (full_name, email, "0000000000", "Location", "Website", "CEO Name", user_id)
-                    )
-
-                # Commit is automatic with context manager, but can be explicit
+                # Insert into Volunteer
+                cursor.execute(
+                    "INSERT INTO Volunteer (FirstName, LastName, DOB, PhoneNumber, Address, UserID) VALUES (?, ?, ?, ?, ?, ?)",
+                    (first_name, last_name, dob, phone, address, user_id)
+                )
                 conn.commit()
-
         except sqlite3.Error as e:
-            # Optional: flash an error or print it for debugging
             print(f"Database error: {e}")
-            return render_template('registration.html', error="Something went wrong. Try again.")
+            return render_template('register_volunteer.html', error="Something went wrong. Try again.")
 
-        # Show a registration success page
         return render_template('RegistrationSuccessful.html', name=first_name)
 
-    # GET request: show registration form
-    return render_template('registration.html')
+    return render_template('register_volunteer.html')
+
+
+# ---------------- Organisation Registration ---------------- #
+@app.route('/register_organisation', methods=['GET', 'POST'])
+def register_organisation():
+    if request.method == 'POST':
+        company_name = request.form.get('company-name')
+        company_email = request.form.get('company-email')
+        company_phone = request.form.get('company-phone')
+        location = request.form.get('location')
+        password = request.form.get('password')
+
+        try:
+            with get_db_connection() as conn:
+                cursor = conn.cursor()
+                # Insert into Users
+                cursor.execute(
+                    "INSERT INTO Users (Email, Username, Password, Role) VALUES (?, ?, ?, ?)",
+                    (company_email, company_name, password, "organisation")
+                )
+                user_id = cursor.lastrowid
+
+                # Insert into Companies
+                cursor.execute(
+                    "INSERT INTO Companies (CompanyName, CompanyEmail, CompanyPhone, CompanyLocation, UserID) VALUES (?, ?, ?, ?, ?)",
+                    (company_name, company_email, company_phone, location, user_id)
+                )
+                conn.commit()
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+            return render_template('register_organisation.html', error="Something went wrong. Try again.")
+
+        return render_template('RegistrationSuccessful.html', name=company_name)
+
+    return render_template('register_organisation.html')
+
 
 @app.route('/privacy')
 def privacy_policy():
@@ -112,7 +133,6 @@ def edit_post_events():
 def update_email():
     current_email = request.form.get('current_email')
     new_email = request.form.get('new_email')
-    # Placeholder: process email update
     return redirect(url_for('account_settings'))
 
 @app.route('/update_password', methods=['POST'])
@@ -120,17 +140,14 @@ def update_password():
     current_password = request.form.get('current_password')
     new_password = request.form.get('new_password')
     confirm_password = request.form.get('confirm_password')
-    # Placeholder: process password update
     return redirect(url_for('account_settings'))
 
 @app.route('/delete_account', methods=['POST'])
 def delete_account():
-    # Placeholder: delete account
     return redirect(url_for('index'))
 
 @app.route('/edit_event', methods=['POST'])
 def edit_event():
-    # Placeholder: handle event creation/edit
     return redirect(url_for('edit_post_events'))
 
 # ---------------- Logout ---------------- #
