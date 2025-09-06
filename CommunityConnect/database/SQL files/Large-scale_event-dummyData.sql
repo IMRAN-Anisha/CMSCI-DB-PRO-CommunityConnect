@@ -1,0 +1,22 @@
+INSERT INTO Events (EventName, EventDate, EventStartTime, EventEndTime, EventLocation, EventFee, EventManager, CompanyID)
+VALUES
+('Beach Clean-Up', '2025-09-10', '08:00', '12:00', 'Sunny Beach', 0, 1, 1),
+('Park Tree Planting', '2025-09-15', '09:00', '13:00', 'Central Park', 0, 1, 2),
+('Food Donation Drive', '2025-09-20', '10:00', '14:00', 'Community Center', 0, 1, 3),
+('Neighborhood Watch Meeting', '2025-09-22', '18:00', '20:00', 'Town Hall', 0, 1, 2),
+('River Cleanup', '2025-09-25', '07:30', '11:30', 'Riverfront', 0, 1, 1),
+('Clothing Drive', '2025-09-28', '09:00', '15:00', 'Community Hall', 0, 1, 3),
+('Tree Awareness Workshop', '2025-10-01', '13:00', '16:00', 'Botanical Garden', 0, 1, 2),
+('Neighborhood Food Prep', '2025-10-03', '10:00', '14:00', 'Local Kitchen', 0, 1, 1),
+('Library Book Drive', '2025-10-05', '09:30', '12:30', 'City Library', 0, 1, 3),
+('Community Sports Day', '2025-10-07', '08:00', '17:00', 'Sports Complex', 0, 1, 2),
+('Animal Shelter Volunteer', '2025-10-09', '09:00', '13:00', 'Animal Shelter', 0, 1, 1),
+('Beach Awareness Campaign', '2025-10-12', '10:00', '14:00', 'Sunny Beach', 0, 1, 3),
+('Local Park Painting', '2025-10-15', '08:00', '12:00', 'Central Park', 0, 1, 2),
+('Food Bank Distribution', '2025-10-18', '09:00', '15:00', 'Community Center', 0, 1, 1),
+('River Trail Clean-Up', '2025-10-20', '07:30', '11:30', 'Riverfront', 0, 1, 3),
+('Neighborhood Garden Care', '2025-10-22', '08:00', '12:00', 'Town Garden', 0, 1, 2),
+('Clothing Swap Event', '2025-10-25', '10:00', '16:00', 'Community Hall', 0, 1, 1),
+('Tree Planting Awareness', '2025-10-28', '13:00', '16:00', 'Botanical Garden', 0, 1, 3),
+('Library Reading Program', '2025-10-30', '09:30', '12:30', 'City Library', 0, 1, 2),
+('Community Volunteer Meet', '2025-11-02', '10:00', '14:00', 'Town Hall', 0, 1, 1);

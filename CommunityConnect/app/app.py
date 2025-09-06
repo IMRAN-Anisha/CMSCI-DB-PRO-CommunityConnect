@@ -164,9 +164,37 @@ def volunteer_dashboard():
     first_name = volunteer['FirstName'] if volunteer else "Volunteer"
     return render_template('VolunteerUserDashboard.html', first_name=first_name)
 
-@app.route('/event_search')
+@app.route('/event_search', methods=['GET', 'POST'])
 def event_search():
-    return render_template('EventSearch.html')
+    if request.method == 'POST' and request.form.get('clear'):
+        # Clear filters
+        return redirect(url_for('event_search'))
+
+    conn = get_db_connection()
+    search_name = request.args.get('search', '').strip()
+    search_date = request.args.get('date', '').strip()
+    search_location = request.args.get('location', '').strip()
+
+    query = "SELECT E.*, C.CompanyName FROM Events E JOIN Companies C ON E.CompanyID = C.CompanyID WHERE 1=1"
+    params = []
+
+    if search_name:
+        query += " AND E.EventName LIKE ?"
+        params.append(f"%{search_name}%")
+    if search_date:
+        query += " AND E.EventDate = ?"
+        params.append(search_date)
+    if search_location:
+        query += " AND E.EventLocation LIKE ?"
+        params.append(f"%{search_location}%")
+
+    query += " ORDER BY E.EventDate ASC"
+    events = conn.execute(query, params).fetchall()
+    conn.close()
+
+    return render_template('EventSearch.html', events=events,
+                           search_name=search_name, search_date=search_date, search_location=search_location)
+
 
 @app.route('/notifications')
 def notifications():
