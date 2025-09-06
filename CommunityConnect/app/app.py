@@ -1,19 +1,21 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from werkzeug.utils import secure_filename
 import sqlite3
 import os
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 DATABASE = os.path.join(os.path.dirname(__file__), '..', 'database', 'CommunityConnect.db')
-print(DATABASE)
 
-# ---------------- SQLite Database Connection ---------------- #
+UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 def get_db_connection():
     conn = sqlite3.connect(DATABASE, timeout=10)
     conn.row_factory = sqlite3.Row
     return conn
 
-# ---------------- GET Routes ---------------- #
+# ---------------- GET ROUTES ---------------- #
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -21,10 +23,34 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        return redirect(url_for('volunteer_dashboard'))
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '').strip()
+        if not email or not password:
+            flash("Please fill all fields.", "error")
+            return render_template('login.html')
+
+        conn = get_db_connection()
+        user = conn.execute(
+            "SELECT * FROM Users WHERE Email = ? AND Password = ?", 
+            (email, password)
+        ).fetchone()
+        conn.close()
+
+        if user:
+            session['user_id'] = user['UserID']
+            session['role'] = user['Role']  # store the role in session
+            flash("Login successful!", "success")
+
+            # Redirect based on role
+            if user['Role'] == 'volunteer':
+                return redirect(url_for('volunteer_dashboard'))
+            elif user['Role'] == 'organisation':
+                return redirect(url_for('organisation_dashboard'))
+        else:
+            flash("Invalid email or password.", "error")
     return render_template('login.html')
 
-# ---------------- Volunteer Registration ---------------- #
+
 @app.route('/register_volunteer', methods=['GET', 'POST'])
 def register_volunteer():
     if request.method == 'POST':
@@ -35,33 +61,33 @@ def register_volunteer():
         phone = request.form.get('phone')
         email = request.form.get('email')
         password = request.form.get('password')
-
         try:
             with get_db_connection() as conn:
                 cursor = conn.cursor()
-                # Insert into Users
                 cursor.execute(
                     "INSERT INTO Users (Email, Username, Password, Role) VALUES (?, ?, ?, ?)",
                     (email, f"{first_name} {last_name}", password, "volunteer")
                 )
                 user_id = cursor.lastrowid
-
-                # Insert into Volunteer
                 cursor.execute(
                     "INSERT INTO Volunteer (FirstName, LastName, DOB, PhoneNumber, Address, UserID) VALUES (?, ?, ?, ?, ?, ?)",
                     (first_name, last_name, dob, phone, address, user_id)
+                )
+                volunteer_id = cursor.lastrowid
+                # Create VolunteerProfile with default image
+                cursor.execute(
+                    "INSERT INTO VolunteerProfile (VolunteerID, profile_image_url) VALUES (?, ?)",
+                    (volunteer_id, 'static/images/defaultProfileImage.png')
                 )
                 conn.commit()
         except sqlite3.Error as e:
             print(f"Database error: {e}")
             return render_template('register_volunteer.html', error="Something went wrong. Try again.")
 
+        flash("Volunteer registration successful!", "success")
         return render_template('RegistrationSuccessful.html', name=first_name)
-
     return render_template('register_volunteer.html')
 
-
-# ---------------- Organisation Registration ---------------- #
 @app.route('/register_organisation', methods=['GET', 'POST'])
 def register_organisation():
     if request.method == 'POST':
@@ -70,18 +96,14 @@ def register_organisation():
         company_phone = request.form.get('company-phone')
         location = request.form.get('location')
         password = request.form.get('password')
-
         try:
             with get_db_connection() as conn:
                 cursor = conn.cursor()
-                # Insert into Users
                 cursor.execute(
                     "INSERT INTO Users (Email, Username, Password, Role) VALUES (?, ?, ?, ?)",
                     (company_email, company_name, password, "organisation")
                 )
                 user_id = cursor.lastrowid
-
-                # Insert into Companies
                 cursor.execute(
                     "INSERT INTO Companies (CompanyName, CompanyEmail, CompanyPhone, CompanyLocation, UserID) VALUES (?, ?, ?, ?, ?)",
                     (company_name, company_email, company_phone, location, user_id)
@@ -91,10 +113,9 @@ def register_organisation():
             print(f"Database error: {e}")
             return render_template('register_organisation.html', error="Something went wrong. Try again.")
 
+        flash("Organisation registration successful!", "success")
         return render_template('RegistrationSuccessful.html', name=company_name)
-
     return render_template('register_organisation.html')
-
 
 @app.route('/privacy')
 def privacy_policy():
@@ -102,11 +123,17 @@ def privacy_policy():
 
 @app.route('/volunteer_dashboard')
 def volunteer_dashboard():
-    return render_template('VolunteerUserDashboard.html', volunteer_name="Your Name")
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Please log in to access your dashboard.", "error")
+        return redirect(url_for('login'))
 
-@app.route('/volunteer_profile')
-def volunteer_profile():
-    return render_template('VolunteerProfilePage.html')
+    conn = get_db_connection()
+    volunteer = conn.execute("SELECT FirstName, LastName FROM Volunteer WHERE UserID = ?", (user_id,)).fetchone()
+    conn.close()
+
+    first_name = volunteer['FirstName'] if volunteer else "Volunteer"
+    return render_template('VolunteerUserDashboard.html', first_name=first_name)
 
 @app.route('/event_search')
 def event_search():
@@ -118,41 +145,312 @@ def notifications():
 
 @app.route('/account_settings')
 def account_settings():
-    return render_template('Accountsettings.html')
+    return render_template('AccountSettings.html')
 
 @app.route('/organisation_dashboard')
 def organisation_dashboard():
-    return render_template('organisationDashboard.html')
+    return render_template('OrganisationUserDashboard.html')
 
 @app.route('/edit_post_events')
 def edit_post_events():
     return render_template('EditPostEvents.html')
 
-# ---------------- POST Routes ---------------- #
+# ---------------- Profile Page ---------------- #
+@app.route('/volunteer_profile', methods=['GET', 'POST'])
+def volunteer_profile():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    volunteer = conn.execute("""
+        SELECT V.FirstName, V.LastName, V.DOB, V.PhoneNumber, V.Address, U.Email, V.VolunteerID
+        FROM Volunteer V
+        JOIN Users U ON V.UserID = U.UserID
+        WHERE V.UserID = ?
+    """, (user_id,)).fetchone()
+
+    if not volunteer:
+        conn.close()
+        flash("Volunteer data not found.", "error")
+        return redirect(url_for('volunteer_dashboard'))
+
+    profile = conn.execute("SELECT profile_image_url FROM VolunteerProfile WHERE VolunteerID = ?", (volunteer['VolunteerID'],)).fetchone()
+    if not profile:
+        conn.execute("INSERT INTO VolunteerProfile (VolunteerID, profile_image_url) VALUES (?, ?)",
+                     (volunteer['VolunteerID'], 'static/images/defaultProfileImage.png'))
+        conn.commit()
+        profile_image = url_for('static', filename='images/defaultProfileImage.png')
+    else:
+        profile_image = profile['profile_image_url'] or url_for('static', filename='images/defaultProfileImage.png')
+
+    conn.close()
+    full_name = f"{volunteer['FirstName']} {volunteer['LastName']}"
+    return render_template(
+        'VolunteerProfilePage.html',
+        volunteer_name=full_name,
+        first_name=volunteer['FirstName'],
+        last_name=volunteer['LastName'],
+        dob=volunteer['DOB'],
+        phone=volunteer['PhoneNumber'],
+        address=volunteer['Address'],
+        email=volunteer['Email'],
+        profile_image=profile_image,
+        current_year=2025
+    )
+
+@app.route('/update_profile_image', methods=['POST'])
+def update_profile_image():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Please log in first.", "error")
+        return redirect(url_for('login'))
+
+    file = request.files.get('profile_image')
+    if not file:
+        flash("Please select an image to upload.", "error")
+        return redirect(url_for('volunteer_profile'))
+
+    filename = secure_filename(file.filename)
+    save_path = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(save_path)
+
+    conn = get_db_connection()
+    volunteer_id = conn.execute("SELECT VolunteerID FROM Volunteer WHERE UserID = ?", (user_id,)).fetchone()['VolunteerID']
+    conn.execute("UPDATE VolunteerProfile SET profile_image_url = ? WHERE VolunteerID = ?", (f'static/uploads/{filename}', volunteer_id))
+    conn.commit()
+    conn.close()
+
+    flash("Profile picture updated successfully!", "success")
+    return redirect(url_for('volunteer_profile'))
+
+# ---------------- Update in Account Settings ---------------- #
 @app.route('/update_email', methods=['POST'])
 def update_email():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Please log in first.", "error")
+        return redirect(url_for('login'))
+
     current_email = request.form.get('current_email')
     new_email = request.form.get('new_email')
+
+    if not current_email or not new_email:
+        flash("Please fill all fields.", "error")
+        return redirect(url_for('account_settings'))
+
+    conn = get_db_connection()
+    conn.execute("UPDATE Users SET Email = ? WHERE UserID = ?", (new_email, user_id))
+    conn.commit()
+    conn.close()
+
+    flash("Email updated successfully!", "success")
     return redirect(url_for('account_settings'))
 
 @app.route('/update_password', methods=['POST'])
 def update_password():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Please log in first.", "error")
+        return redirect(url_for('login'))
+
     current_password = request.form.get('current_password')
     new_password = request.form.get('new_password')
     confirm_password = request.form.get('confirm_password')
+
+    if not current_password or not new_password or not confirm_password:
+        flash("Please fill all fields.", "error")
+        return redirect(url_for('account_settings'))
+
+    if new_password != confirm_password:
+        flash("New password and confirmation do not match.", "error")
+        return redirect(url_for('account_settings'))
+
+    conn = get_db_connection()
+    user = conn.execute("SELECT Password FROM Users WHERE UserID = ?", (user_id,)).fetchone()
+    if not user or user['Password'] != current_password:
+        conn.close()
+        flash("Current password is incorrect.", "error")
+        return redirect(url_for('account_settings'))
+
+    conn.execute("UPDATE Users SET Password = ? WHERE UserID = ?", (new_password, user_id))
+    conn.commit()
+    conn.close()
+
+    flash("Password updated successfully!", "success")
     return redirect(url_for('account_settings'))
 
 @app.route('/delete_account', methods=['POST'])
 def delete_account():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Please log in first.", "error")
+        return redirect(url_for('login'))
+
+    # Optional: confirm user wants to delete account
+    conn = get_db_connection()
+    # Delete from VolunteerProfile if exists
+    volunteer = conn.execute("SELECT VolunteerID FROM Volunteer WHERE UserID = ?", (user_id,)).fetchone()
+    if volunteer:
+        conn.execute("DELETE FROM VolunteerProfile WHERE VolunteerID = ?", (volunteer['VolunteerID'],))
+        conn.execute("DELETE FROM Volunteer WHERE UserID = ?", (user_id,))
+
+    # Delete user from Users table
+    conn.execute("DELETE FROM Users WHERE UserID = ?", (user_id,))
+    conn.commit()
+    conn.close()
+
+    session.clear()
+    flash("Your account has been deleted.", "success")
     return redirect(url_for('index'))
 
-@app.route('/edit_event', methods=['POST'])
-def edit_event():
-    return redirect(url_for('edit_post_events'))
+@app.route('/statistics')
+def statistics():
+    conn = get_db_connection()
 
-# ---------------- Logout ---------------- #
+    volunteers_per_skill = conn.execute("""
+        SELECT S.SkillID, COUNT(V.VolunteerID) AS TotalVolunteers
+        FROM volunteer V
+        INNER JOIN skill S ON V.VolunteerSkills = S.SkillID
+        GROUP BY S.SkillID
+    """).fetchall()
+
+    total_volunteers_per_event = conn.execute("""
+        SELECT E.EventID, E.EventName, COUNT(VE.VolunteerID) AS TotalVolunteers
+        FROM events E
+        INNER JOIN volunteerevents VE ON E.EventID = VE.EventID
+        GROUP BY E.EventID
+    """).fetchall()
+
+    avg_experience_per_skill = conn.execute("""
+        SELECT S.SkillID, AVG(VP.YearsOfExperience) AS AvgExperience
+        FROM volunteer V
+        INNER JOIN volunteerprofile VP ON V.VolunteerID = VP.VolunteerID
+        INNER JOIN skill S ON V.VolunteerSkills = S.SkillID
+        GROUP BY S.SkillID
+    """).fetchall()
+
+    min_max_experience_per_skill = conn.execute("""
+        SELECT S.SkillID, MIN(VP.YearsOfExperience) AS MinExperience, MAX(VP.YearsOfExperience) AS MaxExperience
+        FROM volunteer V
+        INNER JOIN volunteerprofile VP ON V.VolunteerID = VP.VolunteerID
+        INNER JOIN skill S ON V.VolunteerSkills = S.SkillID
+        GROUP BY S.SkillID
+    """).fetchall()
+
+    total_events_fees_per_company = conn.execute("""
+        SELECT C.CompanyID, C.CompanyName, COUNT(E.EventID) AS TotalEvents, SUM(E.EventFee) AS TotalFeesCollected
+        FROM companies C
+        INNER JOIN events E ON C.CompanyID = E.CompanyID
+        GROUP BY C.CompanyID
+    """).fetchall()
+
+    overall_stats = conn.execute("""
+        SELECT
+            COUNT(DISTINCT V.VolunteerID) AS TotalVolunteers,
+            COUNT(DISTINCT E.EventID) AS TotalEvents,
+            AVG(VP.YearsOfExperience) AS AvgExperience,
+            MIN(VP.YearsOfExperience) AS MinExperience,
+            MAX(VP.YearsOfExperience) AS MaxExperience,
+            SUM(E.EventFee) AS TotalFeesCollected
+        FROM volunteer V
+        INNER JOIN volunteerprofile VP ON V.VolunteerID = VP.VolunteerID
+        INNER JOIN volunteerevents VE ON V.VolunteerID = VE.VolunteerID
+        INNER JOIN events E ON VE.EventID = E.EventID
+    """).fetchone()
+
+    conn.close()
+
+    return render_template(
+        'StatisticsDashboard.html',
+        volunteers_per_skill=volunteers_per_skill,
+        total_volunteers_per_event=total_volunteers_per_event,
+        avg_experience_per_skill=avg_experience_per_skill,
+        min_max_experience_per_skill=min_max_experience_per_skill,
+        total_events_fees_per_company=total_events_fees_per_company,
+        overall_stats=overall_stats
+    )
+
+@app.route('/search_volunteer', methods=['GET'])
+def search_volunteer():
+    user_role = session.get('role')
+    if user_role != 'organisation':
+        flash("Only organisations can access this page.", "error")
+        return redirect(url_for('index'))
+
+    conn = get_db_connection()
+
+    # Get skill columns dynamically (excluding SkillID)
+    skill_columns = [col for col in conn.execute("PRAGMA table_info(skill)").fetchall() if col['name'] != 'SkillID']
+    skills = [col['name'] for col in skill_columns]
+
+    # Get selected skill from GET params
+    selected_skill = request.args.get('skill_name')  # matches dropdown "name"
+
+    search_results = None
+    if selected_skill and selected_skill in skills:
+        # Query volunteers who have this skill (1 in that column)
+        search_results = conn.execute(f"""
+            SELECT V.VolunteerID, V.FirstName, V.LastName, V.PhoneNumber,
+                   VP.YearsOfExperience, VP.Certificates, VP.Availability
+            FROM Volunteer V
+            INNER JOIN VolunteerProfile VP ON V.VolunteerID = VP.VolunteerID
+            INNER JOIN skill S ON V.VolunteerID = S.SkillID
+            WHERE S."{selected_skill}" = 1
+        """).fetchall()
+
+    conn.close()
+
+    return render_template(
+        'SearchVolunteers.html',
+        skills=skills,
+        search_results=search_results
+    )
+
+@app.route('/select_event_for_volunteers')
+def select_event_for_volunteers():
+    user_role = session.get('role')
+    if user_role != 'organisation':
+        flash("Only organisations can access this page.", "error")
+        return redirect(url_for('index'))
+
+    conn = get_db_connection()
+    # Get all events created by this organisation
+    events = conn.execute("""
+        SELECT EventID, EventName
+        FROM events
+        WHERE CompanyID = (
+            SELECT CompanyID FROM companies WHERE UserID = ?
+        )
+    """, (session.get('user_id'),)).fetchall()
+    conn.close()
+
+    return render_template('SelectEvent.html', events=events)
+
+@app.route('/event_volunteers_dashboard/<int:event_id>')
+def event_volunteers_dashboard(event_id):
+    user_role = session.get('role')
+    if user_role != 'organisation':
+        flash("Only organisations can access this page.", "error")
+        return redirect(url_for('index'))
+
+    conn = get_db_connection()
+    volunteers = conn.execute("""
+        SELECT V.VolunteerID, V.FirstName, V.LastName, V.PhoneNumber,
+               VP.YearsOfExperience, VP.Certificates, VP.Availability
+        FROM volunteerevents VE
+        JOIN volunteer V ON VE.VolunteerID = V.VolunteerID
+        JOIN volunteerprofile VP ON V.VolunteerID = VP.VolunteerID
+        WHERE VE.EventID = ?
+    """, (event_id,)).fetchall()
+    conn.close()
+
+    return render_template('EventVolunteersDashboard.html', volunteers=volunteers)
+
 @app.route('/logout')
 def logout():
+    session.clear()
+    flash("You have been logged out.", "success")
     return redirect(url_for('index'))
 
 # ---------------- Run App ---------------- #

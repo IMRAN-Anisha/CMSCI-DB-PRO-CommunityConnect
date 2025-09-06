@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Event</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <main>
+        <header>
+            <div class="logo">Community Connect | Select Event</div>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="{{ url_for('organisation_dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="card">
+            <h2>Select an Event</h2>
+                <ul>
+                    {% if events %}
+                        {% for event in events %}
+                        <li>
+                            <a href="{{ url_for('event_volunteers_dashboard', event_id=event['EventID']) }}">
+                                {{ event['EventName'] }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    {% else %}
+                        <li>No events found.</li>
+                    {% endif %}
+                </ul>
+        </div>
+    </main>
+</body>
+</html>

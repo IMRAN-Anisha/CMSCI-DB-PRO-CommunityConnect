@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer Search</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <main>
+        <header>
+            <div class="logo">Community Connect | Volunteer Search</div>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="{{ url_for('event_search') }}">Find Events</a></li>
+                    <li><a href="{{ url_for('organisation_dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('index') }}">Logout</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Search Form -->
+        <div class="card">
+            <h2>Search Volunteers by Skill</h2>
+            <form method="GET" action="{{ url_for('search_volunteer') }}">
+                <label for="skill">Skill:</label>
+                <select name="skill_name" id="skill">
+                    <option value="">-- Select Skill --</option>
+                    {% for skill in skills %}
+                        <option value="{{ skill }}">{{ skill.replace('_', ' ') }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Search</button>
+            </form>
+        </div>
+
+        <!-- Search Results -->
+        {% if search_results %}
+        <div class="card">
+            <h2>Search Results</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Volunteer ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Phone Number</th>
+                        <th>Years of Experience</th>
+                        <th>Certificates</th>
+                        <th>Availability</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in search_results %}
+                    <tr>
+                        <td data-label="Volunteer ID">{{ v.VolunteerID }}</td>
+                        <td data-label="First Name">{{ v.FirstName }}</td>
+                        <td data-label="Last Name">{{ v.LastName }}</td>
+                        <td data-label="Phone Number">{{ v.PhoneNumber }}</td>
+                        <td data-label="Years of Experience">{{ v.YearsOfExperience }}</td>
+                        <td data-label="Certificates">{{ v.Certificates }}</td>
+                        <td data-label="Availability">{{ v.Availability }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </main>
+</body>
+</html>

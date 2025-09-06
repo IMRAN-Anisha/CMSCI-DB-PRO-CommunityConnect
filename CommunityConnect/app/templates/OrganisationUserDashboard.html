@@ -47,6 +47,32 @@
         <h3>Account Settings</h3>
         <p>Manage organisation account</p>
       </a>
+
+      <a href="{{ url_for('statistics') }}" class="tile">
+        <span class="tile-icon">📊</span>
+        <h3>Statistics</h3>
+        <p>View volunteer & event statistics</p>
+      </a>
+
+      <a href="{{ url_for('search_volunteer') }}" class="tile">
+        <span class="tile-icon">🧖</span>
+        <h3>Volunteer Search</h3>
+        <p>Find volunteers for your events</p>
+      </a>
+
+      <a href="{{ url_for('select_event_for_volunteers') }}" class="tile">
+      <span class="tile-icon">✅</span>
+      <h3>Volunteer Attendance</h3>
+      <p>Check who registered for your events</p>
+    </a>
+
+    <a href="{{ url_for('index') }}" class="tile">
+      <span class="tile-icon">👋</span>
+      <h3>Logout</h3>
+      <p>Sign out of your current session</p>
+    </a>
+
+
     </div>
   </section>
 

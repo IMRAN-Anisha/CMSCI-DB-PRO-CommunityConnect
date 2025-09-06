@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <main>
+        <header>
+            <div class="logo">Community Connect | Statistics Dashboard</div>
+            <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}" class="active">Home</a></li>
+                <li><a href="{{ url_for('event_search') }}">Find Events</a></li>
+                <li><a href="{{ url_for('organisation_dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('index') }}">Logout</a></li>
+            </ul>
+            </nav>
+        </header>
+
+
+        <!-- Volunteers per Skill -->
+        <div class="card">
+            <h2>Volunteers per Skill</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Skill ID</th>
+                        <th>Total Volunteers</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in volunteers_per_skill %}
+                    <tr>
+                        <td data-label="Skill ID">{{ row.SkillID }}</td>
+                        <td data-label="Total Volunteers">{{ row.TotalVolunteers }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Total Volunteers per Event -->
+        <div class="card">
+            <h2>Total Volunteers per Event</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Event ID</th>
+                        <th>Event Name</th>
+                        <th>Total Volunteers</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in total_volunteers_per_event %}
+                    <tr>
+                        <td data-label="Event ID">{{ row.EventID }}</td>
+                        <td data-label="Event Name">{{ row.EventName }}</td>
+                        <td data-label="Total Volunteers">{{ row.TotalVolunteers }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Average Experience per Skill -->
+        <div class="card">
+            <h2>Average Experience per Skill</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Skill ID</th>
+                        <th>Average Years of Experience</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in avg_experience_per_skill %}
+                    <tr>
+                        <td data-label="Skill ID">{{ row.SkillID }}</td>
+                        <td data-label="Average Years of Experience">{{ row.AvgExperience|round(2) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Min/Max Experience per Skill -->
+        <div class="card">
+            <h2>Experience Range per Skill</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Skill ID</th>
+                        <th>Min Experience</th>
+                        <th>Max Experience</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in min_max_experience_per_skill %}
+                    <tr>
+                        <td data-label="Skill ID">{{ row.SkillID }}</td>
+                        <td data-label="Min Experience">{{ row.MinExperience }}</td>
+                        <td data-label="Max Experience">{{ row.MaxExperience }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Total Events & Fees per Company -->
+        <div class="card">
+            <h2>Events & Fees per Company</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Company ID</th>
+                        <th>Company Name</th>
+                        <th>Total Events</th>
+                        <th>Total Fees Collected</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in total_events_fees_per_company %}
+                    <tr>
+                        <td data-label="Company ID">{{ row.CompanyID }}</td>
+                        <td data-label="Company Name">{{ row.CompanyName }}</td>
+                        <td data-label="Total Events">{{ row.TotalEvents }}</td>
+                        <td data-label="Total Fees Collected">{{ row.TotalFeesCollected }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Advanced Overall Stats -->
+        <div class="card">
+            <h2>Overall Statistics</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Total Volunteers</th>
+                        <th>Total Events</th>
+                        <th>Avg Experience</th>
+                        <th>Min Experience</th>
+                        <th>Max Experience</th>
+                        <th>Total Fees Collected</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td data-label="Total Volunteers">{{ overall_stats.TotalVolunteers }}</td>
+                        <td data-label="Total Events">{{ overall_stats.TotalEvents }}</td>
+                        <td data-label="Avg Experience">{{ overall_stats.AvgExperience|round(2) }}</td>
+                        <td data-label="Min Experience">{{ overall_stats.MinExperience }}</td>
+                        <td data-label="Max Experience">{{ overall_stats.MaxExperience }}</td>
+                        <td data-label="Total Fees Collected">{{ overall_stats.TotalFeesCollected }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

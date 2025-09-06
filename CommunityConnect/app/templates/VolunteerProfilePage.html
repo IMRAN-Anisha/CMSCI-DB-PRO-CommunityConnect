@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Volunteer Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">CommunityConnect</div>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('volunteer_dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('event_search') }}">Events</a></li>
+                <li><a href="{{ url_for('notifications') }}">Notifications</a></li>
+                <li><a href="{{ url_for('account_settings') }}">Account Settings</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Profile Container -->
+    <div class="profile-container">
+
+        <!-- Sidebar -->
+        <div class="profile-sidebar">
+            <img src="{{ profile_image }}" alt="Profile Picture" class="profile-picture">
+            <h2>{{ volunteer_name }}</h2>
+            <p class="volunteer-title">Volunteer</p>
+            <div class="sidebar-nav">
+                <ul>
+                    <li><a href="{{ url_for('volunteer_dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('volunteer_profile') }}" class="active">Profile</a></li>
+                    <li><a href="{{ url_for('event_search') }}">Search Events</a></li>
+                    <li><a href="{{ url_for('notifications') }}">Notifications</a></li>
+                    <li><a href="{{ url_for('account_settings') }}">Account Settings</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="profile-content">
+            <h3>Personal Information</h3>
+            <form class="edit-profile-form" method="POST" action="#">
+                <label for="first_name">First Name</label>
+                <input type="text" id="first_name" name="first_name" value="{{ first_name }}" required>
+
+                <label for="last_name">Last Name</label>
+                <input type="text" id="last_name" name="last_name" value="{{ last_name }}" required>
+
+                <label for="dob">Date of Birth</label>
+                <input type="date" id="dob" name="dob" value="{{ dob }}" required>
+
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" name="phone" value="{{ phone }}" required>
+
+                <label for="address">Address</label>
+                <input type="text" id="address" name="address" value="{{ address }}" required>
+
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ email }}" required>
+
+                <button type="submit" class="btn primary">Save Changes</button>
+            </form>
+
+            <h3>Profile Picture</h3>
+            <form class="edit-profile-form" method="POST" enctype="multipart/form-data" action="{{ url_for('update_profile_image') }}">
+                <input type="file" name="profile_image" accept="image/*" required>
+                <button type="submit" class="btn secondary">Update Picture</button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        &copy; {{ current_year }} CommunityConnect. <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
+    </footer>
+</body>
+</html>

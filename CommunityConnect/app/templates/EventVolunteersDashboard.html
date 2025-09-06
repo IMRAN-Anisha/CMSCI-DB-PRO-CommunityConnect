@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Volunteers Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <main>
+        <header>
+            <div class="logo">Community Connect | Event Volunteers</div>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="{{ url_for('organisation_dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="card">
+            <h2>Volunteers for Event: {{ event_name }}</h2>
+            {% if volunteers %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Volunteer ID</th>
+                        <th>Full Name</th>
+                        <th>Age</th>
+                        <th>Phone Number</th>
+                        <th>Years of Experience</th>
+                        <th>Certificates</th>
+                        <th>Availability</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in volunteers %}
+                    <tr>
+                        <td>{{ v.VolunteerID }}</td>
+                        <td>{{ v.FullName }}</td>
+                        <td>{{ v.Age }}</td>
+                        <td>{{ v.PhoneNumber }}</td>
+                        <td>{{ v.YearsOfExperience }}</td>
+                        <td>{{ v.Certificates }}</td>
+                        <td>{{ v.Availability }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p>No volunteers signed up yet for this event.</p>
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html>
