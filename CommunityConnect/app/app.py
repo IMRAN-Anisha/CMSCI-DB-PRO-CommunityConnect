@@ -2,10 +2,12 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from werkzeug.utils import secure_filename
 import sqlite3
 import os
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 DATABASE = os.path.join(os.path.dirname(__file__), '..', 'database', 'CommunityConnect.db')
+
 
 UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -31,23 +33,40 @@ def login():
 
         conn = get_db_connection()
         user = conn.execute(
-            "SELECT * FROM Users WHERE Email = ? AND Password = ?", 
-            (email, password)
+            "SELECT * FROM Users WHERE Email = ?", 
+            (email,)
         ).fetchone()
-        conn.close()
 
-        if user:
+        if user and check_password_hash(user['Password'], password):
             session['user_id'] = user['UserID']
-            session['role'] = user['Role']  # store the role in session
-            flash("Login successful!", "success")
+            session['role'] = user['Role']  # store role
 
-            # Redirect based on role
-            if user['Role'] == 'volunteer':
+            # Get display name based on role
+            if user['Role'].lower() == 'volunteer':
+                volunteer = conn.execute(
+                    "SELECT FirstName FROM Volunteer WHERE UserID = ?", 
+                    (user['UserID'],)
+                ).fetchone()
+                session['display_name'] = volunteer['FirstName']
+                conn.close()
                 return redirect(url_for('volunteer_dashboard'))
-            elif user['Role'] == 'organisation':
+            elif user['Role'].lower() == 'organisation':
+                company = conn.execute(
+                    "SELECT CompanyName FROM Companies WHERE UserID = ?", 
+                    (user['UserID'],)
+                ).fetchone()
+                session['display_name'] = company['CompanyName']
+                conn.close()
                 return redirect(url_for('organisation_dashboard'))
+            else:
+                conn.close()
+                flash("Role not recognized.", "error")
+                return render_template('login.html')
         else:
+            conn.close()
             flash("Invalid email or password.", "error")
+            return render_template('login.html')
+
     return render_template('login.html')
 
 
@@ -61,12 +80,16 @@ def register_volunteer():
         phone = request.form.get('phone')
         email = request.form.get('email')
         password = request.form.get('password')
+
+        # Hash the password
+        hashed_password = generate_password_hash(password)
+
         try:
             with get_db_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute(
                     "INSERT INTO Users (Email, Username, Password, Role) VALUES (?, ?, ?, ?)",
-                    (email, f"{first_name} {last_name}", password, "volunteer")
+                    (email, f"{first_name} {last_name}", hashed_password, "volunteer")
                 )
                 user_id = cursor.lastrowid
                 cursor.execute(
@@ -74,7 +97,6 @@ def register_volunteer():
                     (first_name, last_name, dob, phone, address, user_id)
                 )
                 volunteer_id = cursor.lastrowid
-                # Create VolunteerProfile with default image
                 cursor.execute(
                     "INSERT INTO VolunteerProfile (VolunteerID, profile_image_url) VALUES (?, ?)",
                     (volunteer_id, 'static/images/defaultProfileImage.png')
@@ -86,6 +108,7 @@ def register_volunteer():
 
         flash("Volunteer registration successful!", "success")
         return render_template('RegistrationSuccessful.html', name=first_name)
+
     return render_template('register_volunteer.html')
 
 @app.route('/register_organisation', methods=['GET', 'POST'])
@@ -96,12 +119,16 @@ def register_organisation():
         company_phone = request.form.get('company-phone')
         location = request.form.get('location')
         password = request.form.get('password')
+
+        # Hash the password
+        hashed_password = generate_password_hash(password)
+
         try:
             with get_db_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute(
                     "INSERT INTO Users (Email, Username, Password, Role) VALUES (?, ?, ?, ?)",
-                    (company_email, company_name, password, "organisation")
+                    (company_email, company_name, hashed_password, "organisation")
                 )
                 user_id = cursor.lastrowid
                 cursor.execute(
@@ -115,7 +142,9 @@ def register_organisation():
 
         flash("Organisation registration successful!", "success")
         return render_template('RegistrationSuccessful.html', name=company_name)
+
     return render_template('register_organisation.html')
+
 
 @app.route('/privacy')
 def privacy_policy():
