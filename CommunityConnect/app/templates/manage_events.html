@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Events</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+  <header>
+    <div class="logo">Community Connect</div>
+    <nav>
+      <ul>
+        <li><a href="{{ url_for('organisation_dashboard') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('edit_post_events') }}">Create Event</a></li>
+        <li><a href="{{ url_for('account_settings') }}">Account Settings</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Manage Events</h1>
+
+    {% if events %}
+      <table border="1" cellpadding="10">
+        <tr>
+          <th>Name</th>
+          <th>Date</th>
+          <th>Start</th>
+          <th>End</th>
+          <th>Location</th>
+          <th>Fee</th>
+          <th>Duration (mins)</th>
+        </tr>
+        {% for event in events %}
+        <tr>
+          <td>{{ event['EventName'] }}</td>
+          <td>{{ event['EventDate'] }}</td>
+          <td>{{ event['EventStartTime'] }}</td>
+          <td>{{ event['EventEndTime'] }}</td>
+          <td>{{ event['EventLocation'] }}</td>
+          <td>{{ event['EventFee'] }}</td>
+          <td>{{ event['EventDuration'] }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>No events created yet.</p>
+    {% endif %}
+  </main>
+</body>
+</html>

@@ -13,7 +13,6 @@
     <div class="logo">Community Connect</div>
     <nav>
       <ul>
-        <li><a href="{{ url_for('volunteer_dashboard') }}">Dashboard</a></li>
         <li><a href="{{ url_for('event_search') }}">Events</a></li>
         <li><a href="{{ url_for('notifications') }}">Notifications</a></li>
         <li><a href="{{ url_for('account_settings') }}" class="active">Account Settings</a></li>
@@ -33,8 +32,9 @@
         <h3>Email Address</h3>
         <form method="POST" action="{{ url_for('update_email') }}">
           <label for="email">Current Email:</label>
-          <input type="email" id="email" name="current_email" value="volunteer@example.com">
-
+          <input type="email" id="email" name="current_email" 
+            placeholder="Your current email" 
+            value="{{ email }}">
           <label for="new-email">New Email:</label>
           <input type="email" id="new-email" name="new_email" placeholder="Enter new email">
 

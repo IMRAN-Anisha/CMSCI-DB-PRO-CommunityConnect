@@ -174,14 +174,51 @@ def notifications():
 
 @app.route('/account_settings')
 def account_settings():
-    return render_template('AccountSettings.html')
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Please log in first.", "error")
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    user = conn.execute("SELECT Email FROM Users WHERE UserID = ?", (user_id,)).fetchone()
+    conn.close()
+
+    email = user['Email'] if user else ""
+    return render_template('AccountSettings.html', email=email)
+
 
 @app.route('/organisation_dashboard')
 def organisation_dashboard():
     return render_template('OrganisationUserDashboard.html')
 
-@app.route('/edit_post_events')
+@app.route('/edit_post_events', methods=['GET', 'POST'])
 def edit_post_events():
+    if request.method == 'POST':
+        event_name = request.form.get('event-name')
+        event_date = request.form.get('event-date')
+        start_time = request.form.get('start-time')
+        end_time = request.form.get('end-time')
+        location = request.form.get('location')
+        fee = request.form.get('fee', 0)
+        manager = request.form.get('Manager', 0)
+        company_id = session.get('user_id', 1)  # temp fallback
+
+        try:
+            conn = get_db_connection()
+            conn.execute("""
+                INSERT INTO Events 
+                (EventName, EventDate, EventStartTime, EventEndTime, EventLocation, EventFee, EventManager, CompanyID)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (event_name, event_date, start_time, end_time, location, fee, manager, company_id))
+            conn.commit()
+            conn.close()
+
+            flash("✅ Event created successfully!", "success")
+            return redirect(url_for('edit_post_events'))
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+            flash("❌ Error saving event. Try again.", "error")
+
     return render_template('EditPostEvents.html')
 
 # ---------------- Profile Page ---------------- #
@@ -483,6 +520,13 @@ def event_volunteers_dashboard(event_id):
     conn.close()
 
     return render_template('EventVolunteersDashboard.html', volunteers=volunteers)
+
+@app.route('/manage_events')
+def manage_events():
+    conn = get_db_connection()
+    events = conn.execute("SELECT * FROM Events ORDER BY EventDate ASC").fetchall()
+    conn.close()
+    return render_template('manage_events.html', events=events)
 
 @app.route('/logout')
 def logout():
