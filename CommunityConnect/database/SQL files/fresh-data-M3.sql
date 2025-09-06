@@ -1,202 +1,234 @@
--- -----------------------------
--- 1. Drop all tables if they exist
--- -----------------------------
-DROP TABLE IF EXISTS volunteerevents;
-DROP TABLE IF EXISTS eventrequirement;
-DROP TABLE IF EXISTS notifications;
-DROP TABLE IF EXISTS volunteerprofile;
-DROP TABLE IF EXISTS events;
-DROP TABLE IF EXISTS companies;
-DROP TABLE IF EXISTS volunteer;
-DROP TABLE IF EXISTS skill;
-DROP TABLE IF EXISTS users;
+PRAGMA foreign_keys = OFF;
 
--- -----------------------------
--- 2. Recreate tables
--- -----------------------------
-CREATE TABLE users (
-    UserID INTEGER PRIMARY KEY,
+-- Drop tables in correct order
+DROP TABLE IF EXISTS EventRequirements;
+DROP TABLE IF EXISTS VolunteerEvents;
+DROP TABLE IF EXISTS Notifications;
+DROP TABLE IF EXISTS VolunteerProfile;
+DROP TABLE IF EXISTS VolunteerSkills;
+DROP TABLE IF EXISTS Skill;
+DROP TABLE IF EXISTS Events;
+DROP TABLE IF EXISTS Companies;
+DROP TABLE IF EXISTS Volunteer;
+DROP TABLE IF EXISTS Users;
+
+PRAGMA foreign_keys = ON;
+
+--------------------------------------------------
+-- USERS
+--------------------------------------------------
+CREATE TABLE Users (
+    UserID INTEGER PRIMARY KEY AUTOINCREMENT,
     Email TEXT NOT NULL UNIQUE,
-    Username TEXT NOT NULL,
+    Username TEXT NOT NULL UNIQUE,
     Password TEXT NOT NULL,
     Role TEXT NOT NULL
 );
 
-CREATE TABLE volunteer (
-    VolunteerID INTEGER PRIMARY KEY,
+INSERT INTO Users (Email, Username, Password, Role) VALUES
+('alice@example.com', 'alice', 'hashed_pw1', 'Volunteer'),
+('bob@example.com', 'bob', 'hashed_pw2', 'Volunteer'),
+('carol@example.com', 'carol', 'hashed_pw3', 'Company'),
+('dave@example.com', 'dave', 'hashed_pw4', 'Company'),
+('eve@example.com', 'eve', 'hashed_pw5', 'Admin');
+
+--------------------------------------------------
+-- VOLUNTEERS
+--------------------------------------------------
+CREATE TABLE Volunteer (
+    VolunteerID INTEGER PRIMARY KEY AUTOINCREMENT,
     FirstName TEXT NOT NULL,
     LastName TEXT NOT NULL,
     DOB DATE NOT NULL,
     PhoneNumber TEXT NOT NULL,
     Address TEXT NOT NULL,
     UserID INTEGER NOT NULL,
-    FOREIGN KEY (UserID) REFERENCES users(UserID) ON DELETE CASCADE
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
 );
 
-CREATE TABLE volunteerprofile (
-    VolunteerProfileID INTEGER PRIMARY KEY,
+INSERT INTO Volunteer (FirstName, LastName, DOB, PhoneNumber, Address, UserID) VALUES
+('Alice', 'Johnson', '2000-05-12', '0401000001', '123 Main St', 1),
+('Bob', 'Smith', '1999-07-23', '0401000002', '45 River Rd', 2),
+('Clara', 'Brown', '2001-02-10', '0401000003', '67 Oak Ave', 1),
+('Daniel', 'White', '1998-11-03', '0401000004', '89 Pine St', 2),
+('Ella', 'Green', '2002-09-15', '0401000005', '12 Willow Ln', 1);
+
+--------------------------------------------------
+-- SKILL
+--------------------------------------------------
+CREATE TABLE Skill (
+    SkillID INTEGER PRIMARY KEY AUTOINCREMENT,
+    Communication BOOLEAN DEFAULT FALSE,
+    Teamwork BOOLEAN DEFAULT FALSE,
+    Leadership BOOLEAN DEFAULT FALSE,
+    ProblemSolving BOOLEAN DEFAULT FALSE,
+    TimeManagement BOOLEAN DEFAULT FALSE,
+    Organisation BOOLEAN DEFAULT FALSE,
+    Fundraising BOOLEAN DEFAULT FALSE,
+    EventPlanning BOOLEAN DEFAULT FALSE,
+    MediaManage BOOLEAN DEFAULT FALSE,
+    PublicSpeaking BOOLEAN DEFAULT FALSE,
+    Marketing BOOLEAN DEFAULT FALSE,
+    FirstAid BOOLEAN DEFAULT FALSE,
+    Childcare BOOLEAN DEFAULT FALSE,
+    DisabilitySupport BOOLEAN DEFAULT FALSE,
+    Multilingual BOOLEAN DEFAULT FALSE,
+    Translation BOOLEAN DEFAULT FALSE,
+    ITSupport BOOLEAN DEFAULT FALSE,
+    Photography BOOLEAN DEFAULT FALSE,
+    AnimalCare BOOLEAN DEFAULT FALSE
+);
+
+INSERT INTO Skill (Communication, Teamwork, Leadership, ProblemSolving, ITSupport) VALUES
+(1,1,0,1,1),
+(1,1,1,0,0),
+(0,1,1,1,0),
+(1,0,0,1,1),
+(1,1,1,1,1);
+
+--------------------------------------------------
+-- VOLUNTEERSKILLS
+--------------------------------------------------
+CREATE TABLE VolunteerSkills (
+    VolunteerSkillID INTEGER PRIMARY KEY AUTOINCREMENT,
     VolunteerID INTEGER NOT NULL,
-    Bio TEXT NOT NULL,
-    YearsOfExperience INTEGER NOT NULL,
-    Certificates TEXT NOT NULL,
-    Availability TEXT NOT NULL,
-    Endorsements TEXT NOT NULL,
-    profile_image_url TEXT NOT NULL,
-    FOREIGN KEY (VolunteerID) REFERENCES volunteer(VolunteerID) ON DELETE CASCADE
+    SkillID INTEGER NOT NULL,
+    FOREIGN KEY (VolunteerID) REFERENCES Volunteer(VolunteerID) ON DELETE CASCADE,
+    FOREIGN KEY (SkillID) REFERENCES Skill(SkillID) ON DELETE CASCADE
 );
 
-CREATE TABLE companies (
-    CompanyID INTEGER PRIMARY KEY,
+INSERT INTO VolunteerSkills (VolunteerID, SkillID) VALUES
+(1, 1), 
+(2, 2),
+(3, 1), 
+(4, 3), 
+(5, 2);
+
+--------------------------------------------------
+-- COMPANIES
+--------------------------------------------------
+CREATE TABLE Companies (
+    CompanyID INTEGER PRIMARY KEY AUTOINCREMENT,
     CompanyName TEXT NOT NULL,
-    CompanyEmail TEXT NOT NULL,
+    CompanyEmail TEXT NOT NULL UNIQUE,
     CompanyPhone TEXT NOT NULL,
     CompanyLocation TEXT NOT NULL,
-    CompanyWebsite TEXT NOT NULL,
-    CompanyCEO TEXT NOT NULL,
+    CompanyWebsite TEXT,
+    CompanyCEO TEXT,
     UserID INTEGER NOT NULL,
-    FOREIGN KEY (UserID) REFERENCES users(UserID) ON DELETE CASCADE
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
 );
 
-CREATE TABLE skill (
-    SkillID INTEGER PRIMARY KEY,
-    Communication BOOLEAN NOT NULL,
-    Teamwork BOOLEAN NOT NULL,
-    Leadership BOOLEAN NOT NULL,
-    ProblemSolving BOOLEAN NOT NULL,
-    TimeManagement BOOLEAN NOT NULL,
-    Organisation BOOLEAN NOT NULL,
-    Fundraising BOOLEAN NOT NULL,
-    EventPlanning BOOLEAN NOT NULL,
-    MediaManagement BOOLEAN NOT NULL,
-    PublicSpeaking BOOLEAN NOT NULL,
-    Marketing BOOLEAN NOT NULL,
-    FirstAid BOOLEAN NOT NULL,
-    ChildCare BOOLEAN NOT NULL,
-    DisabilitySupport BOOLEAN NOT NULL,
-    AgedCare BOOLEAN NOT NULL,
-    Multilingual BOOLEAN NOT NULL,
-    Translation BOOLEAN NOT NULL,
-    ITSupport BOOLEAN NOT NULL,
-    Photography BOOLEAN NOT NULL,
-    AnimalCare BOOLEAN NOT NULL
-);
+INSERT INTO Companies (CompanyName, CompanyEmail, CompanyPhone, CompanyLocation, CompanyWebsite, CompanyCEO, UserID) VALUES
+('Helping Hands', 'contact@helpinghands.org', '0891111111', 'Perth', 'www.helpinghands.org', 'Sarah Lee', 3),
+('Green Earth', 'info@greenearth.com', '0892222222', 'Sydney', 'www.greenearth.com', 'Tom Hill', 4),
+('Future Minds', 'support@futureminds.edu', '0893333333', 'Melbourne', 'www.futureminds.edu', 'Linda Scott', 3),
+('Animal Care', 'hello@animalcare.org', '0894444444', 'Adelaide', 'www.animalcare.org', 'James King', 4),
+('Food Bank', 'team@foodbank.org', '0895555555', 'Brisbane', 'www.foodbank.org', 'Emma Turner', 3);
 
-CREATE TABLE events (
-    EventID INTEGER PRIMARY KEY,
+--------------------------------------------------
+-- EVENTS
+--------------------------------------------------
+CREATE TABLE Events (
+    EventID INTEGER PRIMARY KEY AUTOINCREMENT,
     EventName TEXT NOT NULL,
     EventDate DATE NOT NULL,
-    EventDuration TEXT NOT NULL,
-    EventStartTime TEXT NOT NULL,
-    EventEndTime TEXT NOT NULL,
-    EventLocation TEXT NOT NULL,
-    EventFee REAL NOT NULL,
-    EventManager TEXT NOT NULL,
+    EventDuration INTEGER NOT NULL,
+    EventStartTime TIME NOT NULL,
+    EventEndTime TIME NOT NULL,
     CompanyID INTEGER NOT NULL,
-    FOREIGN KEY (CompanyID) REFERENCES companies(CompanyID) ON DELETE CASCADE
+    EventLocation TEXT NOT NULL,
+    EventFee REAL DEFAULT 0,
+    EventManager INTEGER,
+    FOREIGN KEY (CompanyID) REFERENCES Companies(CompanyID),
+    FOREIGN KEY (EventManager) REFERENCES Users(UserID)
 );
 
-CREATE TABLE notifications (
-    NotificationID INTEGER PRIMARY KEY,
+INSERT INTO Events (EventName, EventDate, EventDuration, EventStartTime, EventEndTime, CompanyID, EventLocation, EventFee, EventManager) VALUES
+('Tree Planting', '2025-09-20', 180, '09:00', '12:00', 1, 'Kings Park, Perth', 0, 3),
+('Beach Cleanup', '2025-09-22', 240, '08:00', '12:00', 2, 'Bondi Beach, Sydney', 0, 4),
+('STEM Workshop', '2025-09-25', 120, '10:00', '12:00', 3, 'Tech Hub, Melbourne', 10, 3),
+('Animal Shelter Day', '2025-09-27', 300, '09:00', '14:00', 4, 'City Shelter, Adelaide', 0, 4),
+('Food Drive', '2025-09-30', 360, '08:00', '14:00', 5, 'Central Market, Brisbane', 0, 3);
+
+--------------------------------------------------
+-- VOLUNTEERPROFILE
+--------------------------------------------------
+CREATE TABLE VolunteerProfile (
+    VolunteerProfileID INTEGER PRIMARY KEY AUTOINCREMENT,
     VolunteerID INTEGER NOT NULL,
-    EventID INTEGER NOT NULL,
+    Bio TEXT,
+    YearsOfExperience INTEGER,
+    Certificates TEXT,
+    Availability TEXT,
+    Endorsements TEXT,
+    Profile_Image_URL TEXT,
+    FOREIGN KEY (VolunteerID) REFERENCES Volunteer(VolunteerID) ON DELETE CASCADE
+);
+
+INSERT INTO VolunteerProfile (VolunteerID, Bio, YearsOfExperience, Certificates, Availability, Endorsements, Profile_Image_URL) VALUES
+(1, 'Passionate about the environment', 2, 'First Aid', 'Weekends', 'Great teamwork', '/static/images/profiles/alice.png'),
+(2, 'Experienced in fundraising', 3, 'Childcare Cert', 'Weekdays', 'Reliable and punctual', '/static/images/profiles/bob.png'),
+(3, 'Loves working with kids', 1, 'Working with Children Check', 'Evenings', 'Very energetic', '/static/images/profiles/clara.png'),
+(4, 'Background in logistics', 4, 'Leadership Cert', 'Weekdays/Weekends', 'Excellent planner', '/static/images/profiles/daniel.png'),
+(5, 'First aid certified, loves animals', 2, 'First Aid, Animal Care', 'Flexible', 'Highly recommended', '/static/images/profiles/ella.png');
+
+--------------------------------------------------
+-- NOTIFICATIONS
+--------------------------------------------------
+CREATE TABLE Notifications (
+    NotificationID INTEGER PRIMARY KEY AUTOINCREMENT,
+    VolunteerID INTEGER NOT NULL,
+    EventID INTEGER,
     Message TEXT NOT NULL,
-    MessageTitle TEXT NOT NULL,
-    SentTime TEXT NOT NULL,
-    FOREIGN KEY (VolunteerID) REFERENCES volunteer(VolunteerID) ON DELETE CASCADE,
-    FOREIGN KEY (EventID) REFERENCES events(EventID) ON DELETE CASCADE
+    MessageTitle TEXT DEFAULT 'Notification: Alert',
+    SentTime DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (VolunteerID) REFERENCES Volunteer(VolunteerID),
+    FOREIGN KEY (EventID) REFERENCES Events(EventID)
 );
 
-CREATE TABLE eventrequirement (
-    EventReqID INTEGER PRIMARY KEY,
-    SkillID INTEGER NOT NULL,
-    NoOfPeopleReq INTEGER NOT NULL,
-    EventID INTEGER NOT NULL,
-    EventSize TEXT NOT NULL,
-    FOREIGN KEY (SkillID) REFERENCES skill(SkillID) ON DELETE CASCADE,
-    FOREIGN KEY (EventID) REFERENCES events(EventID) ON DELETE CASCADE
-);
+INSERT INTO Notifications (VolunteerID, EventID, Message) VALUES
+(1, 1, 'Reminder: Tree Planting this weekend'),
+(2, 2, 'You are registered for Beach Cleanup'),
+(3, 3, 'New event: STEM Workshop available'),
+(4, 4, 'Shift update for Animal Shelter Day'),
+(5, 5, 'Food Drive volunteer spots confirmed');
 
-CREATE TABLE volunteerevents (
-    VolunteerEventID INTEGER PRIMARY KEY,
+--------------------------------------------------
+-- VOLUNTEEREVENTS
+--------------------------------------------------
+CREATE TABLE VolunteerEvents (
+    VolunteerEventID INTEGER PRIMARY KEY AUTOINCREMENT,
     VolunteerID INTEGER NOT NULL,
     EventID INTEGER NOT NULL,
-    Status TEXT NOT NULL,
-    FOREIGN KEY (VolunteerID) REFERENCES volunteer(VolunteerID) ON DELETE CASCADE,
-    FOREIGN KEY (EventID) REFERENCES events(EventID) ON DELETE CASCADE
+    Status TEXT DEFAULT 'Pending',
+    FOREIGN KEY (VolunteerID) REFERENCES Volunteer(VolunteerID),
+    FOREIGN KEY (EventID) REFERENCES Events(EventID)
 );
 
--- -----------------------------
--- 3. Insert 5 sample rows in each table
--- -----------------------------
+INSERT INTO VolunteerEvents (VolunteerID, EventID, Status) VALUES
+(1,1,'Confirmed'),
+(2,2,'Pending'),
+(3,3,'Confirmed'),
+(4,4,'Cancelled'),
+(5,5,'Pending');
 
--- Users
-INSERT INTO users (Email, Username, Password, Role) VALUES
-('alice@example.com', 'Alice Smith', 'pass1', 'volunteer'),
-('bob@example.com', 'Bob Johnson', 'pass2', 'volunteer'),
-('carol@example.com', 'Carol Lee', 'pass3', 'volunteer'),
-('dave@example.com', 'Dave Kim', 'pass4', 'volunteer'),
-('eve@example.com', 'Eve Clark', 'pass5', 'organisation');
+--------------------------------------------------
+-- EVENTREQUIREMENTS
+--------------------------------------------------
+CREATE TABLE EventRequirements (
+    EventReqID INTEGER PRIMARY KEY AUTOINCREMENT,
+    SkillID INTEGER NOT NULL,
+    NoOfPeopleRequired INTEGER NOT NULL,
+    EventID INTEGER NOT NULL,
+    EventSize INTEGER NOT NULL,
+    FOREIGN KEY (SkillID) REFERENCES Skill(SkillID),
+    FOREIGN KEY (EventID) REFERENCES Events(EventID)
+);
 
--- Volunteers
-INSERT INTO volunteer (FirstName, LastName, DOB, PhoneNumber, Address, UserID) VALUES
-('Alice', 'Smith', '1995-01-01', '111111111', '123 Main St', 1),
-('Bob', 'Johnson', '1993-05-12', '222222222', '456 Oak St', 2),
-('Carol', 'Lee', '1998-07-20', '333333333', '789 Pine St', 3),
-('Dave', 'Kim', '1990-03-15', '444444444', '101 Maple St', 4),
-('Eve', 'Clark', '1992-09-30', '555555555', '202 Elm St', 5);
-
--- Volunteer Profiles
-INSERT INTO volunteerprofile (VolunteerID, Bio, YearsOfExperience, Certificates, Availability, Endorsements, profile_image_url) VALUES
-(1, 'Passionate about helping.', 2, 'CPR', 'Weekends', 'None', 'static/images/defaultProfileImage.png'),
-(2, 'Animal lover.', 3, 'First Aid', 'Weekdays', 'None', 'static/images/defaultProfileImage.png'),
-(3, 'Community volunteer.', 1, 'CPR', 'Weekends', 'None', 'static/images/defaultProfileImage.png'),
-(4, 'Event organizer.', 4, 'CPR, First Aid', 'Evenings', 'None', 'static/images/defaultProfileImage.png'),
-(5, 'Corporate volunteer.', 5, 'Leadership', 'Weekdays', 'None', 'static/images/defaultProfileImage.png');
-
--- Companies
-INSERT INTO companies (CompanyName, CompanyEmail, CompanyPhone, CompanyLocation, CompanyWebsite, CompanyCEO, UserID) VALUES
-('Helping Hands', 'contact@helpinghands.com', '987654321', 'City Center', 'www.helpinghands.com', 'CEO A', 5),
-('Animal Care Org', 'info@animalcare.com', '123123123', 'Town Hall', 'www.animalcare.com', 'CEO B', 5),
-('Green Earth', 'green@earth.com', '321321321', 'Park Ave', 'www.greenearth.com', 'CEO C', 5),
-('Food Bank', 'food@bank.com', '456456456', 'Main Street', 'www.foodbank.com', 'CEO D', 5),
-('Youth Volunteers', 'youth@volunteer.com', '789789789', 'Downtown', 'www.youthvolunteer.com', 'CEO E', 5);
-
--- Skills
-INSERT INTO skill (Communication, Teamwork, Leadership, ProblemSolving, TimeManagement, Organisation, Fundraising, EventPlanning, MediaManagement, PublicSpeaking, Marketing, FirstAid, ChildCare, DisabilitySupport, AgedCare, Multilingual, Translation, ITSupport, Photography, AnimalCare) VALUES
-(1,1,0,1,1,0,0,1,0,1,0,1,0,0,0,1,0,0,0,0),
-(1,0,1,0,1,1,0,0,1,0,1,0,1,0,0,0,1,0,0,0),
-(0,1,1,0,0,1,1,0,0,1,0,0,1,0,1,0,0,1,0,0),
-(1,1,1,1,0,0,1,0,0,0,1,0,0,1,0,0,1,0,1,0),
-(0,0,1,1,1,1,0,1,1,0,0,1,0,0,1,0,1,0,0,1);
-
--- Events
-INSERT INTO events (EventName, EventDate, EventDuration, EventStartTime, EventEndTime, EventLocation, EventFee, EventManager, CompanyID) VALUES
-('Beach Cleanup', '2025-09-10', '4 hours', '08:00', '12:00', 'Sunny Beach', 5.0, 'Manager A', 1),
-('Tree Planting', '2025-09-15', '3 hours', '09:00', '12:00', 'Green Park', 10.5, 'Manager B', 2),
-('Food Drive', '2025-10-01', '5 hours', '10:00', '15:00', 'Community Center', 11.0, 'Manager C', 3),
-('Animal Shelter Help', '2025-10-05', '4 hours', '08:00', '12:00', 'Animal Shelter', 20.0, 'Manager D', 4),
-('Youth Workshop', '2025-11-10', '6 hours', '09:00', '15:00', 'Town Hall', 6.0, 'Manager E', 5);
-
--- Notifications
-INSERT INTO notifications (VolunteerID, EventID, Message, MessageTitle, SentTime) VALUES
-(1,1,'Join our Beach Cleanup event!','Beach Cleanup','2025-09-01 10:00'),
-(2,2,'Tree Planting this weekend!','Tree Planting','2025-09-05 11:00'),
-(3,3,'Food Drive coming soon!','Food Drive','2025-09-20 09:00'),
-(4,4,'Help at the Animal Shelter!','Animal Shelter Help','2025-10-01 14:00'),
-(5,5,'Attend Youth Workshop!','Youth Workshop','2025-10-30 13:00');
-
--- Event Requirements
-INSERT INTO eventrequirement (SkillID, NoOfPeopleReq, EventID, EventSize) VALUES
-(1,5,1,'Small'),
-(2,4,2,'Medium'),
-(3,6,3,'Large'),
-(4,3,4,'Medium'),
-(5,2,5,'Small');
-
--- Volunteer Events
-INSERT INTO volunteerevents (VolunteerID, EventID, Status) VALUES
-(1,1,'Registered'),
-(2,2,'Registered'),
-(3,3,'Registered'),
-(4,4,'Registered'),
-(5,5,'Registered');
+INSERT INTO EventRequirements (SkillID, NoOfPeopleRequired, EventID, EventSize) VALUES
+(1, 5, 1, 20),
+(2, 3, 2, 15),
+(3, 2, 3, 10),
+(4, 4, 4, 25),
+(5, 6, 5, 30);

@@ -308,43 +308,51 @@ def delete_account():
 def statistics():
     conn = get_db_connection()
 
+    # Number of volunteers per skill
     volunteers_per_skill = conn.execute("""
-        SELECT S.SkillID, COUNT(V.VolunteerID) AS TotalVolunteers
-        FROM volunteer V
-        INNER JOIN skill S ON V.VolunteerSkills = S.SkillID
-        GROUP BY S.SkillID
+        SELECT S.SkillID, COUNT(VS.VolunteerID) AS VolunteersWithSkill
+        FROM VolunteerSkills VS
+        JOIN Skill S ON VS.SkillID = S.SkillID
+        GROUP BY S.SkillID;
     """).fetchall()
 
+    # Total volunteers per event
     total_volunteers_per_event = conn.execute("""
         SELECT E.EventID, E.EventName, COUNT(VE.VolunteerID) AS TotalVolunteers
-        FROM events E
-        INNER JOIN volunteerevents VE ON E.EventID = VE.EventID
-        GROUP BY E.EventID
+        FROM Events E
+        INNER JOIN VolunteerEvents VE ON E.EventID = VE.EventID
+        GROUP BY E.EventID;
     """).fetchall()
 
+    # Average experience per skill
     avg_experience_per_skill = conn.execute("""
         SELECT S.SkillID, AVG(VP.YearsOfExperience) AS AvgExperience
-        FROM volunteer V
-        INNER JOIN volunteerprofile VP ON V.VolunteerID = VP.VolunteerID
-        INNER JOIN skill S ON V.VolunteerSkills = S.SkillID
-        GROUP BY S.SkillID
+        FROM VolunteerSkills VS
+        JOIN Volunteer V ON VS.VolunteerID = V.VolunteerID
+        JOIN VolunteerProfile VP ON V.VolunteerID = VP.VolunteerID
+        JOIN Skill S ON VS.SkillID = S.SkillID
+        GROUP BY S.SkillID;
     """).fetchall()
 
+    # Min and max experience per skill
     min_max_experience_per_skill = conn.execute("""
         SELECT S.SkillID, MIN(VP.YearsOfExperience) AS MinExperience, MAX(VP.YearsOfExperience) AS MaxExperience
-        FROM volunteer V
-        INNER JOIN volunteerprofile VP ON V.VolunteerID = VP.VolunteerID
-        INNER JOIN skill S ON V.VolunteerSkills = S.SkillID
-        GROUP BY S.SkillID
+        FROM VolunteerSkills VS
+        JOIN Volunteer V ON VS.VolunteerID = V.VolunteerID
+        JOIN VolunteerProfile VP ON V.VolunteerID = VP.VolunteerID
+        JOIN Skill S ON VS.SkillID = S.SkillID
+        GROUP BY S.SkillID;
     """).fetchall()
 
+    # Total event fees collected per company
     total_events_fees_per_company = conn.execute("""
         SELECT C.CompanyID, C.CompanyName, COUNT(E.EventID) AS TotalEvents, SUM(E.EventFee) AS TotalFeesCollected
-        FROM companies C
-        INNER JOIN events E ON C.CompanyID = E.CompanyID
-        GROUP BY C.CompanyID
+        FROM Companies C
+        JOIN Events E ON C.CompanyID = E.CompanyID
+        GROUP BY C.CompanyID;
     """).fetchall()
 
+    # Overall stats
     overall_stats = conn.execute("""
         SELECT
             COUNT(DISTINCT V.VolunteerID) AS TotalVolunteers,
@@ -353,10 +361,10 @@ def statistics():
             MIN(VP.YearsOfExperience) AS MinExperience,
             MAX(VP.YearsOfExperience) AS MaxExperience,
             SUM(E.EventFee) AS TotalFeesCollected
-        FROM volunteer V
-        INNER JOIN volunteerprofile VP ON V.VolunteerID = VP.VolunteerID
-        INNER JOIN volunteerevents VE ON V.VolunteerID = VE.VolunteerID
-        INNER JOIN events E ON VE.EventID = E.EventID
+        FROM Volunteer V
+        JOIN VolunteerProfile VP ON V.VolunteerID = VP.VolunteerID
+        JOIN VolunteerEvents VE ON V.VolunteerID = VE.VolunteerID
+        JOIN Events E ON VE.EventID = E.EventID;
     """).fetchone()
 
     conn.close()
